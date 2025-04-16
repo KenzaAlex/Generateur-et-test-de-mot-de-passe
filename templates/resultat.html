@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Résultat - SecurePass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <h1>Résultat</h1>
+
+    {% if password %}
+        <p><strong>Mot de passe :</strong> {{ password }}</p>
+    {% endif %}
+
+    {% if score is defined %}
+        <p><strong>Score :</strong> {{ score }}/100</p>
+        <p><strong>Conseils :</strong> {{ feedback }}</p>
+    {% endif %}
+
+    <p><a href="/">⬅ Retour</a></p>
+</body>
+</html>

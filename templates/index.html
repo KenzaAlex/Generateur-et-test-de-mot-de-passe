@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SecurePass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <h1>🔐 SecurePass - Générateur & Vérificateur</h1>
+
+    <h2>Générer un mot de passe</h2>
+    <form action="/generate" method="post">
+        Longueur : <input type="number" name="length" value="12"><br>
+        <input type="checkbox" name="lowercase" checked> minuscules<br>
+        <input type="checkbox" name="uppercase" checked> majuscules<br>
+        <input type="checkbox" name="digits" checked> chiffres<br>
+        <input type="checkbox" name="symbols"> symboles<br>
+        <button type="submit">Générer</button>
+    </form>
+
+    <h2>Vérifier un mot de passe</h2>
+    <form action="/check" method="post">
+        Mot de passe : <input type="text" name="password">
+        <button type="submit">Vérifier</button>
+    </form>
+
+    <p><a href="/blacklist">Voir les mots de passe interdits 🔞</a></p>
+</body>
+</html>
