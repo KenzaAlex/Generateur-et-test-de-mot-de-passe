@@ -1,29 +1,411 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
     <title>SecurePass</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --main-blue: #0d6efd;
+        --dark-blue: #073d8c;
+        --light-blue: #e7f1ff;
+        --text-dark: #222;
+        --text-light: #fff;
+      }
 
-</head>
-<body>
-    <h1>🔐 SecurePass - Générateur & Vérificateur</h1>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    <h2>Générer un mot de passe</h2>
-    <form action="/generate" method="post">
-        Longueur : <input type="number" name="length" value="12"><br>
-        <input type="checkbox" name="lowercase" checked> minuscules<br>
-        <input type="checkbox" name="uppercase" checked> majuscules<br>
-        <input type="checkbox" name="digits" checked> chiffres<br>
-        <input type="checkbox" name="symbols"> symboles<br>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--light-blue);
+        color: var(--text-dark);
+        line-height: 1.6;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      header {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 10;
+        background-color: transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        color: var(--text-light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Trait blanc fin */
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .logo img {
+        height: 60px; /* Logo agrandi */
+        width: auto;
+        filter: brightness(0) invert(1);
+      }
+
+      .logo strong {
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--text-light);
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 2rem;
+      }
+
+      nav > ul > li > a {
+        color: var(--text-light);
+        font-weight: 500;
+        padding: 0.5rem 0;
+        transition: opacity 0.3s ease;
+      }
+
+      nav > ul > li > a:hover {
+        opacity: 0.8;
+      }
+
+      nav ul li {
+        position: relative;
+      }
+
+      nav ul li ul {
+        position: absolute;
+        top: 2.5rem;
+        left: 0;
+        background: var(--dark-blue);
+        border-radius: 6px;
+        min-width: 180px;
+        display: none;
+        box-shadow: 0 4px 8px rgb(7 61 140 / 0.5);
+      }
+
+      nav ul li:hover ul {
+        display: block;
+      }
+
+      nav ul li ul li a {
+        color: var(--text-light);
+        display: block;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      nav ul li ul li a:hover {
+        background: var(--main-blue);
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.4),
+          rgba(13, 110, 253, 0.2)
+        );
+        z-index: 1;
+      }
+
+      .carousel {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .carousel video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+      }
+
+      /* Supprime les styles images car on n'en utilise plus */
+      /* .carousel img { ... } */
+
+      .arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2.5rem;
+        background: rgba(255 255 255 / 0.9);
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        color: var(--dark-blue);
+        user-select: none;
+        transition: background 0.3s ease;
+        box-shadow: 0 0 8px rgb(13 110 253 / 0.3);
+        z-index: 5;
+        display: none; /* on masque les flèches car pas utile pour vidéo */
+      }
+
+      .cards-section {
+        max-width: 960px;
+        margin: 3rem auto;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        width: 280px;
+        padding: 1.8rem 1.5rem;
+        box-shadow: 0 6px 18px rgba(13, 110, 253, 0.15);
+        text-align: center;
+      }
+
+      .card h3 {
+        color: var(--main-blue);
+      }
+
+      .card p {
+        color: var(--dark-blue);
+      }
+
+      .actions {
+        text-align: center;
+        margin: 3rem 0;
+      }
+
+      .actions button {
+        background-color: var(--main-blue);
+        color: var(--text-light);
+        padding: 0.85rem 2rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .form-section {
+        max-width: 360px;
+        background: white;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(13, 110, 253, 0.15);
+        display: none;
+      }
+
+      footer {
+        background-color: var(--main-blue);
+        color: var(--text-light);
+        text-align: center;
+        padding: 1rem 2rem;
+        font-size: 0.9rem;
+        margin-top: 3rem;
+      }
+
+      /* Résultats sous formulaire */
+      .result {
+        margin-top: 1rem;
+        color: var(--dark-blue);
+        font-weight: 600;
+        min-height: 1.5em;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero-overlay"></div>
+
+    <header>
+      <div class="logo">
+        <img src="/static/g-removebg-preview.png" alt="Logo SecurePass" />
+        <strong>GenPass Test</strong>
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#">Mots de passe</a>
+            <ul>
+              <li>
+                <a href="#" onclick="showForm('generate')"
+                  >Générer un mot de passe</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="showForm('check')">Tester la sécurité</a>
+              </li>
+            </ul>
+          </li>
+          <li><a href="/blacklist">Liste noire</a></li>
+          <li><a href="#">Pourquoi un bon mot de passe ?</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="carousel">
+      <video autoplay muted loop playsinline>
+        <source
+          src="/static/18069232-uhd_3840_2160_24fps.mp4"
+          type="video/mp4"
+        />
+      </video>
+    </div>
+
+    <section class="cards-section">
+      <div class="card">
+        <h3>Générer vos mots de passe</h3>
+        <p>
+          Plus besoin de trop réfléchir, nous vous générons un mot de passe pour
+          vous.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Tester la sécurité de vos mots de passe</h3>
+        <p>Vous pouvez tester la sécurité de vos mots de passe.</p>
+      </div>
+      <div class="card">
+        <h3>Voir la liste noire</h3>
+        <p>
+          Vous pouvez voir la liste noire de mots de passe à ne surtout pas
+          utiliser.
+        </p>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button onclick="showForm('check')">Tester mot de passe</button>
+      <button onclick="showForm('generate')">Générer un mot de passe</button>
+    </div>
+
+    <!-- Formulaire Générer -->
+    <div class="form-section" id="generate-form">
+      <h2>Générer un mot de passe</h2>
+      <form id="generate-password-form">
+        <label>
+          Longueur :
+          <input type="number" name="length" value="12" min="4" max="64" />
+        </label>
+        <label
+          ><input type="checkbox" name="lowercase" checked /> minuscules</label
+        ><br />
+        <label
+          ><input type="checkbox" name="uppercase" checked /> majuscules</label
+        ><br />
+        <label><input type="checkbox" name="digits" checked /> chiffres</label
+        ><br />
+        <label><input type="checkbox" name="symbols" /> symboles</label
+        ><br /><br />
         <button type="submit">Générer</button>
-    </form>
+      </form>
+      <div class="result" id="generate-result"></div>
+    </div>
 
-    <h2>Vérifier un mot de passe</h2>
-    <form action="/check" method="post">
-        Mot de passe : <input type="text" name="password">
-        <button type="submit">Vérifier</button>
-    </form>
+    <!-- Formulaire Tester -->
+    <div class="form-section" id="check-form">
+      <h2>Vérifier un mot de passe</h2>
+      <form id="check-password-form">
+        <label>Mot de passe : <input type="text" name="password" /></label
+        ><br /><br />
+        <button type="submit">Tester</button>
+      </form>
+      <div class="result" id="check-result"></div>
+    </div>
 
-    <p><a href="/blacklist">Voir les mots de passe interdits 🔞</a></p>
-</body>
+    <footer>&copy; 2024 GenPass Test. Tous droits réservés.</footer>
+
+    <script>
+      // Affiche le formulaire demandé
+      function showForm(type) {
+        document.getElementById("generate-form").style.display =
+          type === "generate" ? "block" : "none";
+        document.getElementById("check-form").style.display =
+          type === "check" ? "block" : "none";
+        // Reset résultats à chaque affichage
+        if (type === "generate") {
+          document.getElementById("generate-result").textContent = "";
+        } else if (type === "check") {
+          document.getElementById("check-result").textContent = "";
+        }
+        window.scrollTo({ top: 1000, behavior: "smooth" });
+      }
+
+      // Envoi AJAX formulaire génération
+      document
+        .getElementById("generate-password-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const form = e.target;
+          const formData = new FormData(form);
+          const resultDiv = document.getElementById("generate-result");
+
+          resultDiv.textContent = "Génération en cours...";
+
+          try {
+            const response = await fetch("/generate", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) throw new Error("Erreur serveur");
+
+            const data = await response.text(); // Adapter selon backend
+
+            resultDiv.textContent = "Mot de passe généré : " + data;
+          } catch (error) {
+            resultDiv.textContent =
+              "Erreur lors de la génération du mot de passe.";
+          }
+        });
+
+      // Envoi AJAX formulaire test
+      document
+        .getElementById("check-password-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const form = e.target;
+          const formData = new FormData(form);
+          const resultDiv = document.getElementById("check-result");
+
+          resultDiv.textContent = "Test en cours...";
+
+          try {
+            const response = await fetch("/check", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) throw new Error("Erreur serveur");
+
+            const data = await response.text(); // Adapter selon backend
+
+            resultDiv.textContent = "Résultat : " + data;
+          } catch (error) {
+            resultDiv.textContent = "Erreur lors du test du mot de passe.";
+          }
+        });
+    </script>
+  </body>
 </html>

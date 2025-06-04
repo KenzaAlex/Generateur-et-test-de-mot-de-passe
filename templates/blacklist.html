@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
-  
-    
-<head>
+  <head>
     <title>Blacklist - SecurePass</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
     <h1>🚫 Mots de passe interdits</h1>
 
     {% if blacklisted %}
-        <ul>
-        {% for pwd in blacklisted %}
-            <li>{{ pwd }}</li>
-        {% endfor %}
-        </ul>
+    <ul>
+      {% for pwd in blacklisted %}
+      <li>{{ pwd }}</li>
+      {% endfor %}
+    </ul>
     {% else %}
-        <p>Aucun mot dans la blacklist.</p>
+    <p>Aucun mot dans la blacklist.</p>
     {% endif %}
 
     <p><a href="/">⬅ Retour</a></p>
-</body>
+  </body>
 </html>

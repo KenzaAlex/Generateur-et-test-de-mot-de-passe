@@ -56,5 +56,3 @@ def get_blacklisted_passwords():
         if conn:
             cursor.close()
             conn.close()
-
-
